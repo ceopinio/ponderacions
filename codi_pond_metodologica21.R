@@ -1,16 +1,14 @@
-#Ponderacions Enquesta metodològica i actituds sociopolítiques
+#Ponderacions Enquesta metodològica i actituds sociopolítiques REO 1010
 #Centre d'estudis d'opinió
 
 library(haven)
 library(tidyverse)
 library(readr)
-
+library(CEOdata)
 library(survey)
 
-#setwd("~/OneDrive - Generalitat de Catalunya/Documents/Dades x anàlisi CEO/Enquesta metodològica")
-#setwd("~/Dades x anàlisi CEO/Enquesta metodològica")
-dades <- read_sav("W:/Projectes/1. Estudis en curs/1. Propis/P-2021-27. Enquesta metodològica i actituds/Resultats/Base de dades/Microdades revisades.sav")
-
+#Obrim les dades
+dades <- CEOdata(reo= "1010")
 
 #Recodifiquem variables i introduim les dades de població
 
