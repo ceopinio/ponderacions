@@ -9,6 +9,7 @@ library(weights)
 dades <- CEOdata(reo = "1044")
 
 dades_pond <- dades |>
+  filter(MODE_ADMIN == 1) |>
   dplyr::select(ORDRE, SEXE, EDAT_GR, LLOC_NAIX, LLENGUA_PRIMERA, ESTUDIS_1_6, CLUSTER21)
 
 
@@ -19,7 +20,6 @@ poblacio_dist <- read_delim(file.path("dta", "poblacio.csv"),
 
 # Ens quedem amb les dades que tenim de l'últim any per fer les ponderacions
 poblacio_dist <- poblacio_dist |>
-  #dplyr::select(identificador, codi_resposta, res_16, any) |>
   group_by(identificador, codi_resposta) |>
   filter(any == max(any)) |>
   ungroup()
@@ -58,13 +58,7 @@ table(dades_pond$LLOC_NAIX, useNA = "always")
 lloc_naix_dist <- as.data.frame(
   poblacio_dist |> 
     filter(identificador == "LLOC_NAIX") |>
-    # mutate(LLOC_NAIX_SVY = case_when(resposta_16 == "Catalunya" ~ 1,
-    #                                  resposta_16 == "Altres comunitats autònomes" ~ 2,
-    #                                  TRUE ~ 5) ) |> 
     select(codi_resposta, res_16)  |> 
-    # La categoria altres no existeix en la població, anem a crear una categoria fictícia
-    # on la seva proporció a la població sigiui gairebé 0.
-    bind_rows(data.frame( codi_resposta = 99, res_16 = 0.1/(10^100) )) |> 
     mutate( Freq = ((res_16 / 100) * nrow(dades_pond) ) ) |> 
     select(codi_resposta, Freq) |>
     rename(LLOC_NAIX = codi_resposta) )
@@ -121,8 +115,6 @@ cluster_dist <- as.data.frame(
     select(codi_resposta, Freq) |>
     rename(CLUSTER21 = codi_resposta))
 
-
-
 poblacio_dist |>
   filter(identificador == "CLUSTER21",
          codi_resposta <= 6) 
@@ -158,5 +150,5 @@ summary(weights(dades_svy_rake_trim10))
 
 
 ## Creem nova variable en les dades definitives ----------------------------------------
-dades_pond$PONDERA <- weights(dades_svy_rake_trim10)
+dades_pond$PONDERA_ONLINE <- weights(dades_svy_rake_trim10)
 
