@@ -7,4 +7,5 @@ Tota la informació sobre aquesta enquesta la podeu consultar al següent [enlla
 - `Data de treball de camp` 2 de desembre a 10 de febrer de 2023.
 - `Data d'alta de registre` 23-02-2023.
 - `Metodologia` Quantitativa.
+- `Univers` Població de 16 i més anys resident a Catalunya.
 - `Resum` Valoració de l'actuació del Govern de la Generalitat, a nivell general i específic i necessitats, expectatives i prioritats de la ciutadania.
