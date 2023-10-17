@@ -6,6 +6,7 @@ Aquest repositori conté el codi per calcular les ponderacions que s'usen en les
 
 - `enquestes` conté diferents subcarpetes que cada una fa referència a un estudi diferent. Per diferenciar-ho s'ha fet servir el número que l'estudi té en el Registre d'Estudis d'Opinió (REO). Per consultar diferents estudis podeu anar al següent [enllaç](https://ceo.gencat.cat/es/estudis/registre-estudis-dopinio/).  
 - `dta` conté les dades poblacionals per realitzar les ponderacions.
+- `R` conté scripts d'R on es defineixen funcions que s'usen durant el codi de les ponderacions.
 
 ## Estructura de les branques (*branch*)
 
