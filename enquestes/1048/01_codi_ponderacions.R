@@ -9,6 +9,7 @@ library(weights)
 dades <- CEOdata(reo = "1048")
 
 dades_pond <- dades |>
+  filter(MODE_ADMIN == 1) |>
   dplyr::select(ORDRE, SEXE, EDAT_GR, LLOC_NAIX, LLENGUA_PRIMERA, ESTUDIS_1_6, CLUSTER21)
 
 
@@ -158,5 +159,5 @@ summary(weights(dades_svy_rake_trim10))
 
 
 ## Creem nova variable en les dades definitives ----------------------------------------
-dades_pond$PONDERA <- weights(dades_svy_rake_trim10)
+dades_pond$PONDERA_ONLINE <- weights(dades_svy_rake_trim10)
 
