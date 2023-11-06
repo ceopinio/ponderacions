@@ -20,3 +20,4 @@ El repositori té dues branques (*branch*) perquè les enquestes que es realitze
 En aquest apartat es detallen els canvis metodològics en el càlcul de les ponderacions que hi pot haver en les enquestes.
 
 - `REO 1065`: s'utilitza per primera vegada una nova metodologia per calcular les ponderacions que s'usarà en les posteriors enquestes. Aquesta consisteix en fer una imputació *Random Forest* pels valors faltants de les variables que s'usen per la ponderació. Per veure més informació de la metodologia, podeu mirar el codi i també consultar la següent [web](https://www.pewresearch.org/decoded/2020/03/26/weighting-survey-data-with-the-pewmethods-r-package/) de la [Pew Research Center](https://www.pewresearch.org/).
+
