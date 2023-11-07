@@ -7,7 +7,7 @@ library(weights)
 library(pewmethods)
 
 ## Carreguem les dades de l'enquesta ----------------------------
-dades <- CEOdata(reo = "1066", raw = T)
+dades <- CEOdata(reo = "1070", raw = T)
 
 ## Selecció de variables necessaries per a les ponderacions ----------------------------
 dades_raking <- dades |>
@@ -51,8 +51,8 @@ dades_raking <- dades_raking |>
     ### SEXE i EDAT_GR -------------------------------------------------
   group_by(SEXE, EDAT_GR) |> 
     mutate(
-      SEXE_EDAT_SVY = case_when(EDAT_GR > 0 & EDAT_GR != 99 & SEXE == 1 ~ paste0(SEXE, EDAT_GR),
-                                EDAT_GR > 0 & EDAT_GR != 99 & SEXE == 2 ~ paste0("6", EDAT_GR),
+      SEXE_EDAT_SVY = case_when(EDAT_GR %in% c(1:5) & SEXE == 1 ~ paste0(SEXE, EDAT_GR),
+                                EDAT_GR %in% c(1:5) & SEXE == 2 ~ paste0("6", EDAT_GR),
                                 TRUE ~ NA_character_),
       SEXE_EDAT_SVY = as.factor(SEXE_EDAT_SVY)
     ) |> 
