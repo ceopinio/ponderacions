@@ -7,11 +7,11 @@ library(weights)
 library(pewmethods)
 
 ## Carreguem les dades de l'enquesta ----------------------------
-dades <- CEOdata(reo = "1070", raw = T)
+dades <- CEOdata(reo = "1073", raw = T)
 
 ## Selecció de variables necessaries per a les ponderacions ----------------------------
 dades_raking <- dades |>
-  dplyr::select(IDENTIFICADOR, MODE_ADMIN, SEXE, EDAT_GR, LLOC_NAIX, LLENGUA_PRIMERA_1_3, ESTUDIS_1_6, CLUSTER21, HABITAT, PROVINCIA)
+  dplyr::select(ORDRE, MODE_ADMIN, SEXE, EDAT_GR, LLOC_NAIX, LLENGUA_PRIMERA_1_3, ESTUDIS_1_6, CLUSTER21, HABITAT, PROVINCIA)
 
 ## Carreguem les dades poblacionals ----------------------------
 poblacio_dist <- read_delim(file.path("dta", "poblacio.csv"), 
@@ -88,7 +88,7 @@ dades_raking <- dades_raking |>
 colSums(is.na(dades_raking))
 
 dades_imputed <- dades_raking %>% 
-  select(-IDENTIFICADOR, -MODE_ADMIN) %>%
+  select(-ORDRE, -MODE_ADMIN) %>%
   impute_vars(to_impute = c("SEXE_EDAT_SVY", "LLOC_NAIX_SVY", "LLENGUA_PRIMERA_SVY", "ESTUDIS_SVY", "CLUSTER21_SVY",
                             "HABITAT", "PROVINCIA"),
               seed = 739)
