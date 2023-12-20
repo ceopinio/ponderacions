@@ -50,8 +50,8 @@ Població*;CLUSTER21;CLUSTER21_SVY;Cluster;4;4;4;;;2021;6,32;6,71;6,32;6,71;6,67
 Població*;CLUSTER21;CLUSTER21_SVY;Cluster;5;5;5;;;2021;15,48;15,94;15,49;15,93;15,9
 Població*;CLUSTER21;CLUSTER21_SVY;Cluster;6;6;6;;;2021;21,3;20,68;21,29;20,68;20,66
 Població*;CLUSTER21;CLUSTER21_SVY;Cluster;NA;NA;NA;;;2021;0,15;0,14;0,15;0,14;
-Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;2;Generació silenciosa;Generació silenciosa;;extret a partir informació passada pel Joel al Teams de Panel;2023;;;6,6;;
-Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;3;Baby-boomers;Baby-boomers;;extret a partir informació passada pel Joel al Teams de Panel;2023;;;22,9;;
-Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;4;Generació X;Generació X;;extret a partir informació passada pel Joel al Teams de Panel;2023;;;31,3;;
-Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;5;Millennials;Millennials;;extret a partir informació passada pel Joel al Teams de Panel;2023;;;23,8;;
-Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;6;Generació Z;Generació Z;;extret a partir informació passada pel Joel al Teams de Panel;2023;;;15,3;;
+Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;2;Generació silenciosa;Generació silenciosa;;;2023;;;6,6;;
+Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;3;Baby-boomers;Baby-boomers;;;2023;;;22,9;;
+Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;4;Generació X;Generació X;;;2023;;;31,3;;
+Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;5;Millennials;Millennials;;;2023;;;23,8;;
+Població*;EDAT_GENERACIONS;EDAT_GENERACIONS_SVY;Edat generacions;6;Generació Z;Generació Z;;;2023;;;15,3;;
