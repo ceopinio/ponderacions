@@ -8,4 +8,4 @@ Tota la informació sobre aquesta enquesta la podeu consultar al següent [enlla
 - `Data d'alta de registre` 14-12-2023.
 - `Metodologia` Quantitativa.
 - `Univers` Població de 16 i més anys resident a Catalunya.
-- `Resum` Valoració de l'actuació del Govern de la Generalitat, a nivell general i específic i necessitas, expectatives i prioritats de la ciutadania.
+- `Resum` Valoració de l'actuació del Govern de la Generalitat, a nivell general i específic i necessitats, expectatives i prioritats de la ciutadania.
