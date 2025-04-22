@@ -1,0 +1,179 @@
+---
+title: "Ponderacions dels estudis"
+output: html_notebook
+---
+
+## 0.1. Càrrega llibreries
+
+```{r carrega llibreries, message=FALSE, warning=FALSE}
+library(pacman)
+library(tidyverse)
+
+p_load(yaml, # Paquets a utilitzar
+       haven,
+       devtools,
+       pewmethods,
+       mice,
+       survey)
+
+```
+
+## 0.2. Càrrega configuració
+
+```{r carrega config, message=FALSE, warning=FALSE}
+list2env(read_yaml("config/config_jardiaca.yaml"), envir=globalenv())
+source("R/obtenir_dist.R")
+```
+
+## 1. Càrrega dades
+
+```{r carrega dades, message=FALSE, warning=FALSE}
+## Microdades original ---------------------------
+dades <- CEOdata::CEOdata(reo = "1110", raw = TRUE)
+
+## Dades poblacionals ---------------------------
+poblacio_dist <- read_delim(file.path(RUTA_INDICADORS, "poblacio.csv"), 
+                            delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ","), 
+                            trim_ws = TRUE)
+```
+
+## 2. Selecció de les variables necessàries per les ponderacions
+
+Seleccionem les variables següents - SEXE i EDAT_GR (ponderem amb la combinació d'ambdues) - LLOC_NAIX - LLENGUA_PRIMERA_1_3 - ESTUDIS_1_6 - CLUSTER21
+
+```{r dades ponderacions, message=FALSE, warning=FALSE}
+dades_raking <- dades %>% 
+  dplyr::select(IDENTIFICADOR_COMPLET, MODE_ADMIN, SEXE, EDAT_GR, LLOC_NAIX, LLENGUA_PRIMERA_1_3, ESTUDIS_1_6, CLUSTER21, HABITAT, PROVINCIA)
+```
+
+## 3. Neteja dades poblacionals
+
+```{r neteja poblacionals, message=FALSE, warning=FALSE}
+poblacio_dist <- poblacio_dist %>% 
+  group_by(identificador, codi_resposta) |>
+  filter(any == max(any)) |>
+  ungroup() |>
+  # Indiquem les dades poblacionals de referència (residents de 16 anys o més)
+  rename(valor = res_16, # Opcions: res_16, res_18, esp_15, esp_18
+         resposta = resposta_16) |> # Opcions: resposta_16, resposta_18
+  select(identificador_svy, codi_resposta, valor, resposta) |>
+  rename(identificador = identificador_svy)
+```
+
+## 4. Neteja de les dades
+
+Abans de calcular les ponderacions, treiem els valors de la mostra que no hi són a la població i els passem a NA.
+
+```{r neteja dades, message=FALSE, warning=FALSE}
+dades_raking <- dades_raking |> 
+  # SEXE i EDAT_GR -------------------------------------------------
+  group_by(SEXE, EDAT_GR) |> 
+  mutate(
+    SEXE_EDAT_SVY = case_when(EDAT_GR < 100 & EDAT_GR != 99 & SEXE == 1 ~ paste0(SEXE, EDAT_GR),
+                              EDAT_GR < 100 & EDAT_GR != 99 & SEXE == 2 ~ paste0("6", EDAT_GR),
+                              TRUE ~ NA_character_),
+    SEXE_EDAT_SVY = as.factor(SEXE_EDAT_SVY)
+  ) |> 
+  ungroup() |>
+  # LLOC_NAIX -------------------------------------------------
+  mutate(
+    LLOC_NAIX_SVY = as.factor(ifelse(LLOC_NAIX %in% c(1, 2, 5), LLOC_NAIX, NA))
+  ) |>
+  # LLENGUA_PRIMERA -------------------------------------------------
+  mutate(
+    LLENGUA_PRIMERA_SVY = as.factor(ifelse(LLENGUA_PRIMERA_1_3 %in% c(1, 2, 80), LLENGUA_PRIMERA_1_3, NA))
+  ) |>
+  # ESTUDIS -------------------------------------------------
+  mutate(
+    ESTUDIS_SVY = case_when( ESTUDIS_1_6 == 1 ~ 1,
+                             ESTUDIS_1_6 <= 4 ~ 2,
+                             ESTUDIS_1_6 <= 6 ~ 3,
+                             ESTUDIS_1_6 == 7777 ~ NA_real_,
+                             TRUE ~ NA_real_),
+    ESTUDIS_SVY = as.factor(ESTUDIS_SVY),
+  ) |>
+  # CLUSTER21 -------------------------------------------------
+ mutate(
+    CLUSTER21_SVY = as.factor( ifelse(CLUSTER21 %in% c(1:6), CLUSTER21, NA) )
+  )
+```
+
+## 5. Imputem NA
+
+En algunes variables que s'usen per la ponderació hi ha valors faltants, per tant, es du a terme una imputació d'aquests. Per a fer-ho s'usa la funció `impute_vars` del paquet [pewmethods](https://github.com/pewresearch/pewmethods), que es basa en una imputació *Random Forest* a partir de les variables que tenen més relació amb les que tenen valors faltants.
+
+```{r imputation}
+colSums(is.na(dades_raking))
+
+dades_imputed <- dades_raking %>% 
+    select(-IDENTIFICADOR_COMPLET, -MODE_ADMIN) %>%
+    impute_vars(to_impute = c("SEXE_EDAT_SVY", "LLOC_NAIX_SVY", "LLENGUA_PRIMERA_SVY", "ESTUDIS_SVY", "CLUSTER21_SVY", "HABITAT", "PROVINCIA"), seed = 739)
+
+colSums(is.na(dades_imputed))
+```
+
+## 6. Obtenció de les dades poblacionals
+
+A partir de les dades poblacionals, es calcula la freqüència poblacional a partir dels individus de la mostra. Aquest càlcul es fa per a totes les variables que s'escullen per a pondera-les, ja que l'algorisme que s'usa necessita aquesta informació.
+
+```{r data_target}
+# SEXE i EDAT_GR -------------------------------------------------
+sexe_edat_dist <- obtenir_dist("SEXE_EDAT_SVY", dades_imputed, poblacio_dist)
+
+# LLOC_NAIX -------------------------------------------------
+lloc_naix_dist <- obtenir_dist("LLOC_NAIX_SVY", dades_imputed, poblacio_dist)
+  
+# LLENGUA_PRIMERA -------------------------------------------------
+llengua_primera_dist <- obtenir_dist("LLENGUA_PRIMERA_SVY", dades_imputed, poblacio_dist)
+
+# ESTUDIS -------------------------------------------------
+estudis_dist <- obtenir_dist("ESTUDIS_SVY", dades_imputed, poblacio_dist)
+
+# CLUSTER21 -------------------------------------------------
+cluster_dist <- obtenir_dist("CLUSTER21_SVY", dades_imputed, poblacio_dist)
+```
+
+## 7. Raking
+
+```{r raking}
+# Creem les dades d'enquestes sense ponderació i assignant un mostreig aleatori simple
+dades_svy_unweighted <- svydesign(ids = ~ 1, data = dades_imputed)
+
+# Ponderem 
+sample_margins <- list(~SEXE_EDAT_SVY, ~LLOC_NAIX_SVY,  ~LLENGUA_PRIMERA_SVY, ~ESTUDIS_SVY, ~CLUSTER21_SVY)
+population_margins <- list(sexe_edat_dist, lloc_naix_dist, llengua_primera_dist, estudis_dist, cluster_dist)
+
+dades_svy_rake <- rake(design = dades_svy_unweighted,
+                       sample.margins = sample_margins,
+                       population.margins = population_margins)
+
+## Eliminació de pesos extrems (trimming) ----------------------------------------
+dades_svy_rake_trim10 <- trimWeights(dades_svy_rake,
+                                     lower = 0.1,
+                                     upper = 10,
+                                     strict = TRUE) 
+
+
+summary(weights(dades_svy_rake))
+summary(weights(dades_svy_rake_trim10))
+```
+
+## 8. Diagnosi
+
+```{r diagnosi}
+# Obtenir l'aproximació de Kish
+# Obtenim l'efecte del disseny, efecte de la mida de la mostra i l'error d'estimació
+calculate_deff(weights(dades_svy_rake_trim10))
+```
+
+## 9. Guardar resultats
+
+```{r save results}
+## Creem nova variable en les dades definitives ----------------------------------------
+dades_raking$PONDERA <- weights(dades_svy_rake_trim10)
+```
+
+```{r save .sav results}
+## Guardem la matriu .sav ----------------------------------------
+write_sav(dades_raking, file.path(DTA_FOLDER, "PONDERA_SP.sav"))
+```
